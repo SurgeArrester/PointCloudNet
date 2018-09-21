@@ -50,7 +50,6 @@ class STN3d(nn.Module):
         x = F.relu(self.bn5(self.fc2(x))) # linear mlp down to 256 bn and relu
         x = self.fc3(x) # linear down to 9, for each prediction class
 
-        # Why do we add the [1,0,0,0,1,0,0,0,1] to x?
         iden = Variable(torch.from_numpy(np.array([1,0,0,0,1,0,0,0,1]).astype(np.float32))).view(1,9).repeat(batchsize,1)
         
         if x.is_cuda:
@@ -64,23 +63,22 @@ class PointNetfeat(nn.Module):
     def __init__(self, num_points = 2500, global_feat = True):
         super(PointNetfeat, self).__init__()
         self.stn = STN3d(num_points = num_points)
-        self.conv1 = torch.nn.Conv1d(3, 64, 1)
+        self.conv1 = torch.nn.Conv1d(3, 64, 1) # Convolutional nets to scale up
         self.conv2 = torch.nn.Conv1d(64, 128, 1)
         self.conv3 = torch.nn.Conv1d(128, 1024, 1)
-        self.bn1 = nn.BatchNorm1d(64)
+        self.bn1 = nn.BatchNorm1d(64) # Batch normalisations at each stage
         self.bn2 = nn.BatchNorm1d(128)
         self.bn3 = nn.BatchNorm1d(1024)
-        self.mp1 = torch.nn.MaxPool1d(num_points)
+        self.mp1 = torch.nn.MaxPool1d(num_points) # Max pooling ayer for final stage
         self.num_points = num_points
         self.global_feat = global_feat
     def forward(self, x):
         batchsize = x.size()[0]
         trans = self.stn(x)
         x = x.transpose(2,1)
-        # print("X shape is " + str(x.shape) + " trans shape is " + str(trans.shape))
         x = torch.bmm(x, trans)
         x = x.transpose(2,1)
-        x = F.relu(self.bn1(self.conv1(x)))
+        x = F.relu(self.bn1(self.conv1(x))) # Apply layers together
         pointfeat = x
         x = F.relu(self.bn2(self.conv2(x)))
         x = self.bn3(self.conv3(x))
