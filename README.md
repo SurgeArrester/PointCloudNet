@@ -3,7 +3,7 @@ A set of Pre-Processing and Analysis scripts used for the dissertation project o
 
 To use this software, you must have git, python 2.7 and the conda package manager installed on your system. It is assumed that this will be run under a Linux based operating system with at least 5GB of free space, however this may be modified to work under windows. It is recommended to run this using a modern nVidia GPU (although not essential) to leverage the cuda capabilities in training time. Additionally it is assumed the user has available a copy of the base T2 dataset, originally obtained from Vitaliy Kurlin.
 
-* Fork the repository from GitHub \cite{PointCloudNet} to an empty folder on your machine using
+* Fork the repository from GitHub to an empty folder on your machine using
 	`git clone https://github.com/SurgeArrester/PointCloudNet.git`
 
 * item Create the environment to run the programs under by changing to your PointCloudNet folder and running
