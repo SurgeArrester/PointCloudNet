@@ -14,6 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 totalReflections = 0
+reflectionsList = []
 
 class SvdAligner():
     def __init__(self, alignmentCoord = 'T2_4170_num_molGeom.xyz', referenceCoord = 'T2_4170_num_molGeom.xyz'):
@@ -24,6 +25,7 @@ class SvdAligner():
         '''
 
         global totalReflections
+        global reflectionsList
         
         self.fileNameOne = alignmentCoord
         self.fileNameSecond = referenceCoord
@@ -50,6 +52,7 @@ class SvdAligner():
         # therefore we mirror it in the x axis. This works for all remaining T2 molecules (158 of them)
         else:
             totalReflections += 1
+            reflectionsList.append(self.fileNameOne)
             mirrorAxis = np.array([[-1, 0, 0], [0, 1, 1], [0, 0, 1]])
             self.rotationMatrix, self.translationVector = self.svdRotMatix(self.pc1Reduced, self.pc2Reduced, mirrorAxis = mirrorAxis)
             self.alignedCoord = self.rotationMatrix.dot(self.pc1.T)

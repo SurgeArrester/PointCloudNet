@@ -152,8 +152,10 @@ class PointCloud(object):
     def generateTarget(self, coords):
         target = np.zeros(coords.shape[0], dtype='int')
         for i, point in enumerate(coords):
-            target[i] = i - ((i // pc.numMols) * pc.numMols)
+            target[i] = i - ((i // self.numMols) * self.numMols)
         self.target = target
+        return target
+        
                
     def generateAdjacencyMatrixNN(self, coords = None, knn = 10):  
         '''
@@ -319,17 +321,17 @@ if __name__ == "__main__":
     testFile = 'T2_1_num_molGeom.cif'
     filePath = '/home/cameron/Dropbox/T2_Dataset/molGeom/T2_1_num_molGeom.cif'
     outputFile = 'output.txt'
-
+    
     coordinatePath = '/home/cameron/Desktop/xyz/'
     extendedPath = '/home/cameron/Desktop/extended/'
-
+    
     k = 7
     np.set_printoptions(formatter={'float': lambda x: "{0:0.3f}".format(x)})
-
+    
     time_start = time.time()
     totalProcessed = 0.0
     totalFiles = len(os.listdir(directory))
-
+    
     for filename in os.listdir(directory):
         print(directory + filename)
         pc = PointCloud(directory + filename)
@@ -349,23 +351,23 @@ if __name__ == "__main__":
         # pc.plot(pc.extendedCloud)
         print('Percentage complete: ' + str((totalProcessed / totalFiles) * 100))
         print('Time taken: ' + str(time.time() - time_start) + 's\n\n')
-        print
-
-    #pc = PointCloud(directory + testFile)
-    #print('Time taken: ' + str(time.time() - time_start))   
-
-
-    #    with open(outputFile, 'a') as output:
-    #        output.write(str(filename) + " ")
-    #        for i in range(k):
-    #            output.write(str(np.around(pc.simplifiedMinimumDist[i], 7)) + " ")
-    #        output.write("\n")
-    #    pc.generateNetInput(pc.cartesianCoords, writeToFile =False)
-    #        
-    #    #pc.atomicFingerPrint(x[0])
-    #    
-    #    #fingerPrint = pc.atomicFingerPrint
-    #    pc.plot(pc.cartesianCoords)
-    #    pc.plot(pc.extendedCloud)
         
+
+#pc = PointCloud(directory + testFile)
+#print('Time taken: ' + str(time.time() - time_start))   
+
+
+#    with open(outputFile, 'a') as output:
+#        output.write(str(filename) + " ")
+#        for i in range(k):
+#            output.write(str(np.around(pc.simplifiedMinimumDist[i], 7)) + " ")
+#        output.write("\n")
+#    pc.generateNetInput(pc.cartesianCoords, writeToFile =False)
+#        
+#    #pc.atomicFingerPrint(x[0])
+#    
+#    #fingerPrint = pc.atomicFingerPrint
+#    pc.plot(pc.cartesianCoords)
+#    pc.plot(pc.extendedCloud)
+    
 
