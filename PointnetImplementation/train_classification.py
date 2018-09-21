@@ -27,7 +27,7 @@ parser.add_argument('--nepoch', type=int, default=25, help='number of epochs to 
 parser.add_argument('--outf', type=str, default='cls',  help='output folder')
 parser.add_argument('--model', type=str, default = '',  help='model path')
 parser.add_argument('--scoresFolder', type=str, default = 'scoresClassification/', help='Folder for scores')
-parser.add_argument('--dataset', type=str, default='../Datasets/T2Dataset', help='Dataset to load')
+parser.add_argument('--dataset', type=str, default='T2Dataset', help='Dataset to load')
 
 opt = parser.parse_args()
 print (opt)
@@ -74,6 +74,15 @@ num_batch = len(dataset)/opt.batchSize
 testLoss = []
 testAccuracy = []
 
+# Create scores folder if not existing
+if not os.path.exists(opt.scoresFolder):
+        os.makedirs(opt.scoresFolder)
+
+# Create a folder for the scores and 
+if not os.path.exists(opt.scoresFolder + "/predictions/"):
+        os.makedirs(opt.scoresFolder + "/predictions/")
+
+
 for epoch in range(opt.nepoch):
     for i, data in enumerate(dataloader, 0):
         points, target = data
@@ -100,15 +109,24 @@ for epoch in range(opt.nepoch):
             pred, _ = classifier(points)
             loss = F.nll_loss(pred, target)
             pred_choice = pred.data.max(1)[1]
+
+            labels = target.data
+            classifications = pred_choice
+
             correct = pred_choice.eq(target.data).cpu().sum()
             testLoss.append(loss.item())
             testAccuracy.append(correct.item()/float(opt.batchSize))
             print('[%d: %d/%d] %s loss: %f accuracy: %f' %(epoch, i, num_batch, blue('test'), loss.item(), correct.item()/float(opt.batchSize)))
 
-    torch.save(classifier.state_dict(), '%s/cls_model_%d.pth' % (opt.outf, epoch))
+            with open(opt.scoresFolder + "/predictions/labelIterationEp" + str(epoch) + "it" + str(i) + ".out", "wb") as lossFile:
+                for item in labels:
+                    lossFile.write("{}\n".format(item))
 
-if not os.path.exists(opt.scoresFolder):
-        os.makedirs(opt.scoresFolder)  
+            with open(opt.scoresFolder + "/predictions/classIterationEp" + str(epoch) + "it" + str(i) + ".out", "wb") as accuracyFile:
+                for item in classifications:
+                    accuracyFile.write("{}\n".format(item))
+
+    torch.save(classifier.state_dict(), '%s/cls_model_%d.pth' % (opt.outf, epoch))  
         
 with open(opt.scoresFolder + "/lossClassification.out", "wb") as lossFile:
     for item in testLoss:
